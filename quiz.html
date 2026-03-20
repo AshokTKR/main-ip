@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InCred Premier Bond Quiz</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f6f9; color: #1a1a2e; min-height: 100vh; }
+
+  .header {
+    background: #1a1a2e;
+    padding: 12px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header-left { display: flex; flex-direction: column; }
+  .header-left strong { color: #fff; font-size: 14px; }
+  .header-left span { color: #aaa; font-size: 11px; margin-top: 2px; }
+
+  /* Logo */
+  .logo-wrap {
+    background: #fff;
+    border-radius: 6px;
+    padding: 6px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1;
+  }
+  .logo-text {
+    display: flex;
+    align-items: baseline;
+    gap: 0;
+    font-family: 'Arial Black', Arial, sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+  }
+  .logo-incred { color: #F47920; }
+  .logo-premier-wrap { position: relative; display: inline-block; }
+  .logo-premier { color: #1E3A8A; }
+  .logo-underline {
+    display: block;
+    height: 2.5px;
+    background: #1E3A8A;
+    border-radius: 2px;
+    width: 100%;
+    margin-top: 1px;
+  }
+  .logo-tagline {
+    font-size: 9px;
+    color: #555;
+    font-style: italic;
+    margin-top: 3px;
+    letter-spacing: 0.3px;
+  }
+
+  .container { max-width: 720px; margin: 36px auto; padding: 0 16px 60px; }
+  .card { background: #fff; border-radius: 12px; padding: 40px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+  .card h1 { font-size: 22px; color: #1a1a2e; margin-bottom: 10px; }
+  .card p { color: #555; font-size: 15px; margin-bottom: 16px; line-height: 1.6; }
+  .badge-row { display: flex; gap: 12px; margin: 18px 0 24px; flex-wrap: wrap; }
+  .badge { background: #f0f2f7; border-radius: 20px; padding: 6px 16px; font-size: 13px; color: #444; font-weight: 500; }
+  .badge span { color: #e8500a; font-weight: 700; }
+  .name-input { width: 100%; padding: 13px 16px; border: 2px solid #e0e4ef; border-radius: 9px; font-size: 15px; margin-bottom: 18px; outline: none; transition: border 0.2s; }
+  .name-input:focus { border-color: #e8500a; }
+  .primary-btn { background: #e8500a; color: #fff; border: none; border-radius: 8px; padding: 13px 36px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; margin-bottom: 10px; transition: background 0.2s; }
+  .primary-btn:hover { background: #c94208; }
+  .primary-btn:disabled { background: #ccc; cursor: default; }
+  .secondary-btn { background: #1a1a2e; color: #fff; border: none; border-radius: 8px; padding: 13px 36px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; transition: background 0.2s; }
+  .secondary-btn:hover { background: #e8500a; }
+
+  .progress-bar-wrap { background: #eee; border-radius: 10px; height: 6px; margin-bottom: 22px; }
+  .progress-bar { background: linear-gradient(90deg, #e8500a, #ff7c3e); height: 6px; border-radius: 10px; transition: width 0.4s; }
+  .q-meta { display: flex; justify-content: space-between; font-size: 13px; color: #888; margin-bottom: 14px; align-items: center; }
+  .q-tag { background: #fff3ee; color: #e8500a; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px; text-transform: uppercase; }
+  .q-text { font-size: 17px; font-weight: 600; color: #1a1a2e; line-height: 1.55; margin-bottom: 24px; }
+  .options { display: flex; flex-direction: column; gap: 11px; }
+  .opt { border: 2px solid #e0e4ef; border-radius: 9px; padding: 13px 18px; font-size: 15px; cursor: pointer; transition: all 0.18s; background: #fff; text-align: left; display: flex; align-items: center; gap: 12px; }
+  .opt:hover:not(:disabled) { border-color: #e8500a; background: #fff8f5; }
+  .opt-letter { width: 28px; height: 28px; border-radius: 50%; background: #f0f2f7; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #555; flex-shrink: 0; }
+  .opt.correct { border-color: #22c55e; background: #f0fdf4; }
+  .opt.correct .opt-letter { background: #22c55e; color: #fff; }
+  .opt.wrong { border-color: #ef4444; background: #fef2f2; }
+  .opt.wrong .opt-letter { background: #ef4444; color: #fff; }
+  .opt:disabled { cursor: default; }
+  .explanation { margin-top: 20px; background: #f8f9ff; border-left: 4px solid #e8500a; border-radius: 0 8px 8px 0; padding: 14px 16px; font-size: 14px; color: #333; line-height: 1.6; }
+  .explanation strong { color: #e8500a; }
+  .next-btn { margin-top: 24px; background: #e8500a; color: #fff; border: none; border-radius: 8px; padding: 13px 32px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; transition: background 0.2s; }
+  .next-btn:hover { background: #c94208; }
+
+  .score-circle { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 6px solid #e8500a; }
+  .score-num { font-size: 36px; font-weight: 800; color: #e8500a; }
+  .score-denom { font-size: 14px; color: #888; }
+  .breakdown { display: flex; justify-content: center; gap: 20px; margin: 20px 0 28px; flex-wrap: wrap; }
+  .bk { background: #f4f6f9; border-radius: 10px; padding: 14px 22px; text-align: center; }
+  .bk-num { font-size: 22px; font-weight: 800; }
+  .bk-label { font-size: 12px; color: #888; margin-top: 2px; }
+
+  .tab-row { display: flex; gap: 8px; margin-bottom: 24px; }
+  .tab { padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: 2px solid #e0e4ef; background: #fff; color: #555; }
+  .tab.active { background: #e8500a; color: #fff; border-color: #e8500a; }
+  .lb-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .lb-table { width: 100%; border-collapse: collapse; }
+  .lb-table th { background: #1a1a2e; color: #fff; padding: 11px 14px; text-align: left; font-size: 13px; }
+  .lb-table td { padding: 11px 14px; border-bottom: 1px solid #f0f2f7; font-size: 14px; }
+  .lb-table tr:hover td { background: #fafbff; }
+  .rank-1 td:first-child::before { content: "🥇 "; }
+  .rank-2 td:first-child::before { content: "🥈 "; }
+  .rank-3 td:first-child::before { content: "🥉 "; }
+  .score-pill { display: inline-block; padding: 3px 12px; border-radius: 20px; font-weight: 700; font-size: 13px; }
+  .score-high { background: #f0fdf4; color: #16a34a; }
+  .score-mid { background: #fff7ed; color: #d97706; }
+  .score-low { background: #fef2f2; color: #dc2626; }
+  .empty-lb { text-align: center; color: #aaa; padding: 32px; font-size: 14px; }
+  .loading { text-align: center; color: #aaa; padding: 20px; font-size: 14px; }
+  .saving-msg { font-size: 13px; color: #888; margin-top: 10px; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <strong>Bond Investing Assessment</strong>
+    <span>Sales Team Knowledge Quiz</span>
+  </div>
+  <div class="logo-wrap">
+    <div class="logo-text">
+      <span class="logo-incred"><img alt="app" border="0" src="https://raw.githubusercontent.com/AshokTKR/main-ip/refs/heads/main/IP-Logo-png.png" style="padding-top: 5px;" width="160px;"></span>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="app"></div>
+
+<script>
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxaU8vpV2ATR-NfjV2WbW8VZb4-36-IgysmXoVAOVgyWftorr7OYCtOCm8FfVoppyNzCw/exec';
+
+const questions = [
+  { tag:"Bond Concepts", q:"Which body regulates the corporate bond market in India?", opts:["IRDAI","RBI","PFRDA","SEBI"], ans:3, exp:"SEBI (Securities and Exchange Board of India) regulates the corporate bond market. RBI governs government securities and monetary policy." },
+  { tag:"Bond Concepts", q:"What does 'yield to maturity' (YTM) represent for a bond investor?", opts:["The total annualised return if the bond is held till maturity","The coupon rate fixed at issuance","The issuer's credit rating score","The bond's current market price"], ans:0, exp:"YTM is the total expected return on a bond if held to maturity, factoring in coupon payments, price paid, and face value received at redemption." },
+  { tag:"Bond Concepts", q:"If RBI raises the repo rate, what typically happens to existing bond prices?", opts:["Only government bond prices fall","Bond prices remain unchanged","Bond prices fall","Bond prices rise"], ans:2, exp:"Bond prices and interest rates have an inverse relationship. When RBI raises rates, new bonds offer higher yields, making existing lower-yield bonds less attractive — so their prices fall." },
+  { tag:"Taxation", q:"For listed bonds held for more than 12 months in India, gains are classified as:", opts:["Tax-free under Section 10","Long-term capital gains taxed at 20% with indexation","Short-term capital gains taxed at slab rate","Long-term capital gains taxed at 12.5% without indexation"], ans:3, exp:"For listed bonds, the holding period for LTCG is 12 months. LTCG on listed bonds is taxed at 12.5% without the benefit of indexation." },
+  { tag:"Credit Ratings", q:"A bond rated 'AA' by CRISIL compared to an 'AAA' bond would typically offer:", opts:["No coupon payments","The same yield as AAA bonds","A higher yield to compensate for slightly higher credit risk","A lower yield because it is safer"], ans:2, exp:"AA-rated bonds carry marginally higher credit risk than AAA. To attract investors, issuers must offer a higher yield spread — this is called the credit risk premium." },
+  { tag:"Bond Types", q:"Which of the following best describes a Non-Convertible Debenture (NCD)?", opts:["A bond with a floating interest rate only","A fixed-income instrument that cannot be converted into equity shares","A government-issued bond with sovereign guarantee","A debenture that converts into equity at maturity"], ans:1, exp:"NCDs are debt instruments issued by companies that cannot be converted into equity. They offer fixed returns and are listed on stock exchanges for liquidity." },
+  { tag:"Bond Concepts", q:"What does 'duration' measure in the context of bond investing?", opts:["The time between coupon payments","The number of years to maturity","The issuer's average loan tenure","A bond's sensitivity to interest rate changes"], ans:3, exp:"Duration (specifically Modified Duration) measures how much a bond's price will change for a 1% change in interest rates. Higher duration = higher interest rate sensitivity." },
+  { tag:"Indian Markets", q:"Government Securities (G-Secs) in India are issued by:", opts:["SIDBI for infrastructure projects","RBI on behalf of the Central and State governments","NSE directly to retail investors","SEBI on behalf of corporates"], ans:1, exp:"RBI issues G-Secs on behalf of the Government of India. These carry sovereign guarantee and are considered the safest bonds in the Indian market." },
+  { tag:"Bond Concepts", q:"What is a 'credit spread' in bond markets?", opts:["The fee charged by a bond distributor","The gap between bid and ask price on an exchange","The difference in maturity between two bonds","The yield difference between two bonds of the same maturity but different credit quality"], ans:3, exp:"Credit spread is the extra yield a higher-risk bond offers over a safer bond of similar maturity. It compensates investors for taking on additional credit/default risk." },
+  { tag:"Regulations", q:"Under SEBI regulations, which category of bonds is sold only to qualified institutional buyers (QIBs) without public issue requirements?", opts:["Sovereign Gold Bonds","Tax-free bonds","Privately placed bonds","Retail NCDs"], ans:2, exp:"Privately placed bonds are issued to a select group of investors (typically QIBs) without a public offer. They have fewer disclosure requirements but are not available to retail investors directly." },
+  { tag:"Issuer Knowledge", q:"Keertana Finserve's AUM is approximately ₹2,349 Cr. What is the dominant loan category comprising ~85% of this AUM?", opts:["Home loans","MSME loans","Personal loans","Gold loans"], ans:3, exp:"As of 30th Sept 2025, approximately 85% of Keertana Finserve's AUM comprises gold loans. The company targets low- and middle-income households in rural areas." },
+  { tag:"Issuer Knowledge", q:"Spandana Sphoorty has a GNPA of 5.60% and an NNPA of 1.20%. What does the significant gap between GNPA and NNPA indicate?", opts:["GNPA and NNPA are always equal for microfinance lenders","The company has made no provisions for bad loans","The company has made substantial provisions against its gross bad loans, reducing net NPA significantly","The company has written off most stressed assets without provisioning"], ans:2, exp:"GNPA represents total bad loans before provisions; NNPA is what remains after provisions are deducted. Spandana's GNPA of 5.60% vs NNPA of 1.20% indicates it has provided heavily against stressed assets — a sign of prudent provisioning, even though the high GNPA reflects underlying portfolio stress." },
+  { tag:"Issuer Knowledge", q:"mPokket Financial Services has key lenders including InCred, ICICI Bank, and Axis Bank. Its CRAR stands at 29.17%. What does a high CRAR indicate?", opts:["CRAR only applies to manufacturing companies","The company's gearing is dangerously high","The company has a high level of non-performing assets","The company is well-capitalised relative to its risk-weighted assets"], ans:3, exp:"CRAR (Capital to Risk-weighted Assets Ratio) measures a lender's capital adequacy. A CRAR of 29.17% — well above RBI's minimum requirement — indicates mPokket is strongly capitalised to absorb potential losses." },
+  { tag:"Issuer Knowledge", q:"Zetwerk Manufacturing is fundamentally different from the other three bond issuers in this portfolio. What is the key distinction?", opts:["Zetwerk has the lowest revenue among the four issuers","Zetwerk is a microfinance institution","Zetwerk is 100% promoter-owned like Keertana","Zetwerk is a non-lending manufacturing marketplace — not an NBFC"], ans:3, exp:"Unlike Keertana, Spandana, and mPokket which are lending/NBFC businesses, Zetwerk is a managed marketplace connecting large manufacturers with SMB manufacturers. Its metrics (Revenue: ₹12,653 Cr, Gearing: 0.4x) reflect a non-financial business model." },
+  { tag:"Issuer Knowledge", q:"Among the four issuers, which company has the lowest gearing ratio (0.4x), and what does this imply for bond investors?", opts:["mPokket — implying the company has too little equity","Spandana Sphoorty — implying high leverage risk","Zetwerk Manufacturing — implying lower financial leverage and relatively lower debt risk","Keertana Finserve — implying aggressive lending expansion"], ans:2, exp:"Zetwerk's gearing of 0.4x is the lowest among the four issuers. Lower gearing means less debt relative to equity, which generally implies a lower risk of financial distress — a positive signal for bond investors." }
+];
+
+let screen = 'name', userName = '', current = 0, score = 0, answered = false;
+
+function render() {
+  const app = document.getElementById('app');
+  if (!app) return;
+  if (screen === 'name') app.innerHTML = nameHTML();
+  else if (screen === 'quiz') app.innerHTML = quizHTML();
+  else if (screen === 'result') app.innerHTML = resultHTML();
+  else if (screen === 'leaderboard') { app.innerHTML = lbShellHTML(); loadLeaderboard(); }
+}
+
+function nameHTML() {
+  return `<div class="card" style="text-align:center">
+    <h1 style="margin-bottom:10px">Bond Investing Assessment</h1>
+    <p>Designed for the <strong>InCred Premier Sales Team</strong>. 15 questions across bond concepts and issuer knowledge.</p>
+    <div class="badge-row" style="justify-content:center">
+      <div class="badge"><span>15</span> Questions</div>
+      <div class="badge"><span>Hard</span> Difficulty</div>
+      <div class="badge"><span>Leaderboard</span> Enabled</div>
+    </div>
+    <p style="font-size:13px;color:#888;margin-bottom:20px">Enter your name to begin. Your score will be saved to the team leaderboard.</p>
+    <input class="name-input" id="nameField" placeholder="Your full name" maxlength="40"
+      oninput="document.getElementById('startBtn').disabled=!this.value.trim()"
+      onkeydown="if(event.key==='Enter'&&this.value.trim())beginQuiz()" />
+    <button class="primary-btn" id="startBtn" disabled onclick="beginQuiz()">Start Quiz →</button>
+    <button class="secondary-btn" onclick="viewLB()">View Leaderboard</button>
+  </div>`;
+}
+
+function quizHTML() {
+  const q = questions[current];
+  const pct = (current / questions.length) * 100;
+  const letters = ['A','B','C','D'];
+  return `<div class="card">
+    <div class="progress-bar-wrap"><div class="progress-bar" style="width:${pct}%"></div></div>
+    <div class="q-meta"><span class="q-tag">${q.tag}</span><span>Question ${current+1} of ${questions.length}</span></div>
+    <div class="q-text">${q.q}</div>
+    <div class="options">${q.opts.map((o,i)=>`<button class="opt" id="opt${i}" onclick="selectAnswer(${i})">
+      <span class="opt-letter">${letters[i]}</span>${o}</button>`).join('')}
+    </div>
+    <div id="feedback"></div>
+    <div id="nextWrap"></div>
+  </div>`;
+}
+
+function resultHTML() {
+  const pct = Math.round((score / questions.length) * 100);
+  const msg = pct>=80 ? "Excellent! You're well-prepared to advise clients on bond investments."
+             : pct>=60 ? "Good effort! Review the explanations to sharpen your knowledge."
+             : "Keep learning! Bond expertise is key to serving InCred Premier clients well.";
+  return `<div class="card" style="text-align:center">
+    <div class="score-circle"><div class="score-num">${score}</div><div class="score-denom">out of ${questions.length}</div></div>
+    <h1 style="margin-bottom:8px">${pct>=80?'🏆 Outstanding!':pct>=60?'👍 Good Job!':'📚 Keep Studying'}</h1>
+    <p>${msg}</p>
+    <div class="breakdown">
+      <div class="bk"><div class="bk-num" style="color:#22c55e">${score}</div><div class="bk-label">Correct</div></div>
+      <div class="bk"><div class="bk-num" style="color:#ef4444">${questions.length-score}</div><div class="bk-label">Incorrect</div></div>
+      <div class="bk"><div class="bk-num" style="color:#e8500a">${pct}%</div><div class="bk-label">Score</div></div>
+    </div>
+    <p class="saving-msg" id="saveStatus">✓ Score saved to leaderboard</p>
+    <button class="primary-btn" style="margin-top:16px" onclick="viewLB()">View Leaderboard</button>
+    <button class="secondary-btn" onclick="restart()">Retake Quiz</button>
+  </div>`;
+}
+
+function lbShellHTML() {
+  return `<div class="card">
+    <div class="tab-row">
+      <div class="tab" onclick="screen='name';render()">← Back</div>
+      <div class="tab active">🏆 Leaderboard</div>
+    </div>
+    <div class="lb-header">
+      <h2>Team Leaderboard</h2>
+      <button onclick="loadLeaderboard()" style="background:none;border:1px solid #e0e4ef;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;color:#555">↻ Refresh</button>
+    </div>
+    <div id="lb-body"><div class="loading">Loading scores from Google Sheets…</div></div>
+  </div>`;
+}
+
+async function loadLeaderboard() {
+  const lbEl = document.getElementById('lb-body');
+  if (!lbEl) return;
+  lbEl.innerHTML = '<div class="loading">Loading scores…</div>';
+  try {
+    const res = await fetch(SHEET_URL + '?nocache=' + Date.now());
+    const data = await res.json();
+    const entries = (data.entries || []).filter(e => e.name && e.score !== '');
+    if (entries.length === 0) {
+      lbEl.innerHTML = `<div class="empty-lb">No submissions yet. Be the first to complete the quiz!</div>`;
+      return;
+    }
+    // Sort by score descending
+    entries.sort((a, b) => Number(b.score) - Number(a.score));
+    const rows = entries.map((e, i) => {
+      const pct = Math.round((Number(e.score)/15)*100);
+      const pill = pct>=80?'score-high':pct>=60?'score-mid':'score-low';
+      const rankClass = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+      return `<tr class="${rankClass}">
+        <td>${i+1}. ${e.name}</td>
+        <td style="text-align:center"><span class="score-pill ${pill}">${e.score}/15 (${pct}%)</span></td>
+        <td>${e.date}</td>
+      </tr>`;
+    }).join('');
+    lbEl.innerHTML = `<table class="lb-table">
+      <thead><tr><th>Name</th><th style="text-align:center">Score</th><th>Date</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  } catch(err) {
+    lbEl.innerHTML = `<div class="empty-lb">⚠️ Could not load leaderboard. Check your internet connection.</div>`;
+  }
+}
+
+function beginQuiz() {
+  const n = document.getElementById('nameField').value.trim();
+  if (!n) return;
+  userName = n; current = 0; score = 0; answered = false; screen = 'quiz'; render();
+}
+
+function selectAnswer(i) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const letters = ['A','B','C','D'];
+  for (let j = 0; j < q.opts.length; j++) {
+    const btn = document.getElementById('opt'+j);
+    btn.disabled = true;
+    if (j === q.ans) btn.classList.add('correct');
+    else if (j === i) btn.classList.add('wrong');
+  }
+  if (i === q.ans) score++;
+  document.getElementById('feedback').innerHTML =
+    `<div class="explanation"><strong>${i===q.ans?'✓ Correct!':'✗ Incorrect.'}</strong> ${q.exp}</div>`;
+  const isLast = current === questions.length - 1;
+  document.getElementById('nextWrap').innerHTML =
+    `<button class="next-btn" onclick="${isLast?'finishQuiz()':'nextQ()'}">${isLast?'View My Results':'Next Question →'}</button>`;
+}
+
+async function finishQuiz() {
+  screen = 'result'; render();
+  const d = new Date();
+  const dateStr = d.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+  const pct = Math.round((score/questions.length)*100);
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: userName, score, percentage: pct, date: dateStr })
+    });
+  } catch(e) {
+    const el = document.getElementById('saveStatus');
+    if (el) el.textContent = '⚠️ Could not save score. Check connection.';
+  }
+}
+
+function nextQ() { current++; answered = false; render(); }
+function viewLB() { screen = 'leaderboard'; render(); }
+function restart() { screen = 'name'; render(); }
+
+render();
+</script>
+</body>
+</html>
